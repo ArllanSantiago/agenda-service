@@ -1,0 +1,47 @@
+
+--drop table agenda;
+--drop table paciente;
+
+create table paciente
+(
+	id serial primary key not null,
+	nome varchar(60),
+	sobrenome varchar(100),
+	cpf varchar(15) not null,
+	email varchar(100)
+);
+
+create table agenda
+(
+	id serial primary key,
+	descricao varchar(200),
+	data_hora timestamp,
+	data_criacao timestamp,
+	paciente_id integer not null,
+	CONSTRAINT FK_PACIENTE_AGENDA foreign key (paciente_id) references paciente(id)
+);
+do $$
+	declare
+	   paciente_obj paciente%rowtype;
+	   agenda_obj agenda%rowtype;
+	begin
+	  select COALESCE(max(id),0) +1  into paciente_obj.id  from paciente;
+	  paciente_obj.nome = 'paciente';
+	  paciente_obj.sobrenome = 'fake';
+	  paciente_obj.cpf = '00000';
+	  paciente_obj.email = 'test@test.com';
+
+	  select COALESCE(max(id),0) +1 into agenda_obj.id from agenda;
+	  agenda_obj.descricao = 'Clinico Geral-Dor de Cabeça';
+	  agenda_obj.data_hora = NOW() :: TIMESTAMP;
+	  agenda_obj.data_criacao = NOW() :: TIMESTAMP;
+	  agenda_obj.paciente_id = paciente_obj.id;
+
+	  insert into paciente values (paciente_obj.*);
+	  insert into agenda values (agenda_obj.*);
+	end; 
+$$;
+
+select * from paciente pa
+inner join agenda ag on pa.id = ag.paciente_id;
+
