@@ -9,13 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
-public class AgendaService implements IComumService<Agenda> {
+public final class AgendaService implements IComumService<Agenda> {
     private final AgendaRepository agendaRepository;
 
 
@@ -27,6 +28,10 @@ public class AgendaService implements IComumService<Agenda> {
     @Override
     public Agenda buscarPorId(Long id) {
         return agendaRepository.findById(id).orElse(Agenda.builder().build());
+    }
+
+    public Optional<Agenda> buscarPorIdOp(Long id) {
+        return agendaRepository.findById(id);
     }
 
     @Override
